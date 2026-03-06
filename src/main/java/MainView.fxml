@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.shape.Rectangle?>
+
+<!-- Χρησιμοποίησε BorderPane ή StackPane ως root αντί για VBox -->
+<StackPane xmlns="http://javafx.com/javafx"
+           xmlns:fx="http://javafx.com/fxml"
+           fx:controller="MainController">
+
+    <!-- ΚΥΡΙΟ ΠΕΡΙΕΧΟΜΕΝΟ - VBox -->
+    <VBox styleClass="main-container"
+          alignment="TOP_CENTER"
+          spacing="20">
+
+        <padding>
+            <Insets top="30.0" right="25.0" bottom="30.0" left="25.0"/>
+        </padding>
+
+        <!-- Τίτλος -->
+        <Label text="Website Quality Checker" styleClass="title"/>
+
+        <!-- URL Field με label -->
+        <VBox spacing="10.0" alignment="CENTER">
+            <Label text="Website URL:" styleClass="url-label"/>
+            <TextField fx:id="urlField" promptText="https://example.com"
+                       styleClass="url-field"/>
+        </VBox>
+
+        <!-- Κουμπιά ανάλυσης -->
+        <HBox spacing="15.0" alignment="CENTER">
+            <Button text="🔍 Analyze" onAction="#analyze"
+                    styleClass="analyze-button"/>
+
+            <Button text="📊 History" onAction="#showHistory"
+                    styleClass="history-button"/>
+
+            <Button text="💾 Export" onAction="#exportResults"
+                    styleClass="export-button"/>
+        </HBox>
+
+        <!-- Progress Bar -->
+        <ProgressBar fx:id="progressBar" styleClass="progress-bar"
+                     visible="false"/>
+
+        <!-- Αποτελέσματα -->
+        <TextArea fx:id="output" editable="false" wrapText="true"
+                  styleClass="output-area"/>
+    </VBox>
+
+    <!-- POPUP ΙΣΤΟΡΙΚΟΥ - ΕΠΙΠΛΕΟΝ ΣΤΟΙΒΑ (StackPane) -->
+    <StackPane fx:id="historyPopup"
+               visible="false"
+               managed="false"
+               styleClass="popup-overlay"
+               alignment="CENTER">
+
+        <!-- Ημιδιάφανο φόντο -->
+        <Rectangle styleClass="popup-backdrop"
+                   width="${historyPopup.width}"
+                   height="${historyPopup.height}"/>
+
+        <!-- Κάρτα ιστορικού -->
+        <VBox styleClass="popup-card"
+              spacing="15"
+              alignment="CENTER"
+              maxWidth="600"
+              maxHeight="500">
+
+            <Label text="Website Analysis History" styleClass="popup-title"/>
+
+            <!-- TextArea ιστορικού -->
+            <TextArea fx:id="historyArea"
+                      editable="false"
+                      wrapText="true"
+                      styleClass="popup-textarea"
+                      VBox.vgrow="ALWAYS"/>
+
+            <!-- Κουμπιά διαχείρισης -->
+            <HBox spacing="15" alignment="CENTER" styleClass="h-box">
+                <Button text="💾 Export" onAction="#exportHistoryToFile"
+                        styleClass="export-button"/>
+                <Button text="♻ Clear" onAction="#clearHistory"
+                        styleClass="history-button"/>
+                <Button text="✖ Close" onAction="#closeHistoryPopup"
+                        styleClass="cancel-button"/>
+            </HBox>
+        </VBox>
+    </StackPane>
+</StackPane>

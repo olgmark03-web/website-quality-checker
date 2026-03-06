@@ -1,0 +1,223 @@
+/* ===== ΟΛΟΚΛΗΡΟ ΤΟ ΠΑΡΑΘΥΡΟ ===== */
+.root {
+    -fx-background-color: #ffc2d1;
+    -fx-font-family: 'Segoe UI', 'Roboto', sans-serif;
+}
+
+/* ===== ΚΥΡΙΟ CONTAINER ===== */
+.main-container {
+    -fx-background-color: linear-gradient(to bottom right, #ffe4ec, #fbcfe8);
+    -fx-alignment: top-center;
+}
+
+/* ===== ΤΙΤΛΟΣ ===== */
+.title {
+    -fx-font-size: 26px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #1e40af;
+    -fx-padding: 0 0 25px 0;
+}
+
+/* ===== URL LABEL ===== */
+.url-label {
+    -fx-font-size: 16px;
+    -fx-font-weight: 600;
+    -fx-text-fill: #1e40af;
+    -fx-padding: 0 0 12px 0;
+}
+
+/* ===== TEXT FIELD ===== */
+.url-field {
+    -fx-background-color: white;
+    -fx-background-radius: 25px;
+    -fx-border-radius: 25px;
+    -fx-border-color: #3b82f6;
+    -fx-border-width: 2px;
+    -fx-padding: 14px 25px;
+    -fx-font-size: 15px;
+    -fx-prompt-text-fill: #9ca3af;
+    -fx-text-fill: #1e40af;
+    -fx-pref-width: 500px;
+    -fx-max-width: 500px;
+}
+
+/* ===== ΚΟΥΜΠΙΑ - ΚΟΙΝΑ STYLES ===== */
+.analyze-button, .history-button, .export-button {
+    -fx-background-radius: 25px;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-font-size: 16px;
+    -fx-padding: 12px 25px;
+    -fx-cursor: hand;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.2), 8, 0, 0, 3);
+    -fx-min-width: 160px;
+}
+
+/* ===== ΚΟΥΜΠΙ ΑΝΑΛΥΣΗΣ ===== */
+.analyze-button {
+    -fx-background-color: linear-gradient(to right, #3b82f6, #6366f1);
+}
+.analyze-button:hover {
+    -fx-background-color: linear-gradient(to right, #2563eb, #4f46e5);
+    -fx-effect: dropshadow(gaussian, rgba(37, 99, 235, 0.4), 12, 0, 0, 6);
+}
+
+/* ===== ΚΟΥΜΠΙ ΙΣΤΟΡΙΚΟΥ ===== */
+.history-button {
+    -fx-background-color: linear-gradient(to right, #10b981, #34d399);
+}
+.history-button:hover {
+    -fx-background-color: linear-gradient(to right, #059669, #10b981);
+    -fx-effect: dropshadow(gaussian, rgba(16, 185, 129, 0.4), 12, 0, 0, 6);
+}
+
+/* ===== ΚΟΥΜΠΙ ΕΞΑΓΩΓΗΣ ===== */
+.export-button {
+    -fx-background-color: linear-gradient(to right, #8b5cf6, #a78bfa);
+}
+.export-button:hover {
+    -fx-background-color: linear-gradient(to right, #7c3aed, #8b5cf6);
+    -fx-effect: dropshadow(gaussian, rgba(139, 92, 246, 0.4), 12, 0, 0, 6);
+}
+
+/* ===== HBOX ΓΙΑ ΤΑ ΚΟΥΜΠΙΑ ===== */
+.h-box {
+    -fx-spacing: 15px;
+    -fx-alignment: center;
+    -fx-padding: 20px 0;
+}
+
+/* ===== PROGRESS BAR ===== */
+.progress-bar {
+    -fx-background-color: #e0f2fe;
+    -fx-background-radius: 10px;
+    -fx-pref-width: 500px;
+    -fx-max-width: 500px;
+    -fx-pref-height: 12px;
+}
+.progress-bar > .bar {
+    -fx-background-color: linear-gradient(to right, #3b82f6, #60a5fa);
+    -fx-background-radius: 10px;
+    -fx-background-insets: 2px;
+}
+
+/* ===== TEXT AREA ===== */
+.output-area {
+    -fx-background-color: white;
+    -fx-background-radius: 20px;
+    -fx-border-radius: 20px;
+    -fx-border-color: #bfdbfe;
+    -fx-border-width: 2px;
+    -fx-padding: 20px;
+    -fx-font-size: 15px;
+    -fx-text-fill: #1e40af;
+    -fx-pref-width: 550px;
+    -fx-max-width: 550px;
+    -fx-pref-height: 250px;
+    -fx-max-height: 350px;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.05), 15, 0, 0, 3);
+}
+.output-area .content {
+    -fx-background-color: transparent;
+    -fx-background-radius: 18px;
+}
+/* ===== POPUP STYLES ===== */
+.popup-overlay {
+    -fx-background-color: transparent;
+    -fx-alignment: center;
+    -fx-padding: 50px;
+}
+
+.popup-backdrop {
+    -fx-fill: rgba(0, 0, 0, 0.5);
+}
+
+/* ΡΟΖ ΚΑΡΤΑ ΙΣΤΟΡΙΚΟΥ */
+.popup-card {
+    -fx-background-color: linear-gradient(to bottom right, #ffe4ec, #fbcfe8);  /* ΡΟΖ gradient */
+    -fx-background-radius: 25px;
+    -fx-border-radius: 25px;
+    -fx-border-color: #f9a8d4;
+    -fx-border-width: 2px;
+    -fx-padding: 30px;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.3), 20, 0, 0, 5);
+    -fx-max-width: 650px;
+    -fx-min-width: 600px;
+    -fx-max-height: 550px;
+    -fx-min-height: 500px;
+}
+
+.popup-title {
+    -fx-font-size: 24px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #9d174d;  /* Σκούρο ροζ για αντίθεση */
+    -fx-padding: 0 0 15px 0;
+    -fx-effect: dropshadow(gaussian, white, 1, 0, 0, 1);
+}
+
+.popup-textarea {
+    -fx-background-color: rgba(255, 255, 255, 0.9);  /* Λευκό με slight διαφάνεια */
+    -fx-background-radius: 20px;
+    -fx-border-radius: 20px;
+    -fx-border-color: #f9a8d4;
+    -fx-border-width: 2px;
+    -fx-padding: 20px;
+    -fx-font-size: 14px;
+    -fx-text-fill: #831843;  /* Σκούρο ροζ-μοβ */
+    -fx-pref-width: 550px;
+    -fx-pref-height: 320px;
+    -fx-font-family: 'Monospaced', monospace;  /* Για ωραία εμφάνιση αποτελεσμάτων */
+}
+
+.popup-textarea .content {
+    -fx-background-color: transparent;
+    -fx-background-radius: 18px;
+}
+
+/* ===== ΟΜΟΙΟΜΟΡΦΑ ΚΟΥΜΠΙΑ ===== */
+.popup-card .button {
+    -fx-background-radius: 25px;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-font-size: 15px;
+    -fx-padding: 12px 20px;
+    -fx-cursor: hand;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.2), 8, 0, 0, 3);
+    -fx-min-width: 120px;  /* ΟΛΑ ΙΔΙΟ ΜΕΓΕΘΟΣ */
+    -fx-pref-width: 120px;  /* ΟΛΑ ΙΔΙΟ ΜΕΓΕΘΟΣ */
+    -fx-max-width: 120px;   /* ΟΛΑ ΙΔΙΟ ΜΕΓΕΘΟΣ */
+}
+
+/* Κουμπί Export - Μωβ */
+.popup-card .export-button {
+    -fx-background-color: linear-gradient(to right, #8b5cf6, #a78bfa);
+}
+.popup-card .export-button:hover {
+    -fx-background-color: linear-gradient(to right, #7c3aed, #8b5cf6);
+    -fx-effect: dropshadow(gaussian, rgba(139, 92, 246, 0.4), 12, 0, 0, 6);
+}
+
+/* Κουμπί Clear - Πράσινο */
+.popup-card .history-button {
+    -fx-background-color: linear-gradient(to right, #10b981, #34d399);
+}
+.popup-card .history-button:hover {
+    -fx-background-color: linear-gradient(to right, #059669, #10b981);
+    -fx-effect: dropshadow(gaussian, rgba(16, 185, 129, 0.4), 12, 0, 0, 6);
+}
+
+/* Κουμπί Close - Κόκκινο */
+.popup-card .cancel-button {
+    -fx-background-color: linear-gradient(to right, #ef4444, #f87171);
+}
+.popup-card .cancel-button:hover {
+    -fx-background-color: linear-gradient(to right, #dc2626, #ef4444);
+    -fx-effect: dropshadow(gaussian, rgba(220, 38, 38, 0.4), 12, 0, 0, 6);
+}
+
+/* HBox για τα κουμπιά - κεντραρισμένο */
+.popup-card .h-box {
+    -fx-spacing: 20px;
+    -fx-alignment: center;
+    -fx-padding: 20px 0 10px 0;
+}
