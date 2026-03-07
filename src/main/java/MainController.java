@@ -31,7 +31,7 @@ public class MainController {
 
     }
 
-    // Μέθοδος ανάλυσης ιστοσελίδας - κύρια λειτουργία της εφαρμογής
+    // Μέθοδος ανάλυσης ιστοσελίδας
     @FXML
     public void analyze() {
         // Λήψη URL από το πεδίο εισαγωγής και αφαίρεση περιττών κενών
@@ -47,7 +47,6 @@ public class MainController {
         //Έλεγχος και προσθήκη πρωτοκόλλου(http/https) αν λείπει
         if (!originalUrl.startsWith("http://") && !originalUrl.startsWith("https://")) {
             urlToAnalyze = "https://" + originalUrl;
-            // Ενημερώνουμε για συνοχή
             Platform.runLater(() -> urlField.setText(urlToAnalyze));
         } else {
             urlToAnalyze = originalUrl;
@@ -74,7 +73,7 @@ public class MainController {
                 //Επιστροφή στο GUI thread για ενημέρωση της διεπαφής
                 Platform.runLater(() -> {
                     progressBar.setVisible(false);
-                    output.setText(result); // Εμφάνιση αποτελεσμάτων
+                    output.setText(result);
                     showAlert(Alert.AlertType.INFORMATION, "Analysis Complete",
                             "Website analysis saved to history.");
                 });
@@ -99,7 +98,7 @@ public class MainController {
         if (historyPopup != null) {
             historyPopup.setVisible(true);
             historyPopup.setManaged(true);
-            historyPopup.toFront(); // Φέρε μπροστά
+            historyPopup.toFront(); // Φέρε μπροστά το popup παράθυρο
         }
     }
     @FXML

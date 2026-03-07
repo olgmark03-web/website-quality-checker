@@ -132,7 +132,7 @@
     -fx-fill: rgba(0, 0, 0, 0.5);
 }
 
-/* ΡΟΖ ΚΑΡΤΑ ΙΣΤΟΡΙΚΟΥ */
+/* ΚΑΡΤΑ ΙΣΤΟΡΙΚΟΥ */
 .popup-card {
     -fx-background-color: linear-gradient(to bottom right, #ffe4ec, #fbcfe8);  /* ΡΟΖ gradient */
     -fx-background-radius: 25px;
@@ -150,23 +150,23 @@
 .popup-title {
     -fx-font-size: 24px;
     -fx-font-weight: bold;
-    -fx-text-fill: #9d174d;  /* Σκούρο ροζ για αντίθεση */
+    -fx-text-fill: #9d174d;
     -fx-padding: 0 0 15px 0;
     -fx-effect: dropshadow(gaussian, white, 1, 0, 0, 1);
 }
 
 .popup-textarea {
-    -fx-background-color: rgba(255, 255, 255, 0.9);  /* Λευκό με slight διαφάνεια */
+    -fx-background-color: rgba(255, 255, 255, 0.9);
     -fx-background-radius: 20px;
     -fx-border-radius: 20px;
     -fx-border-color: #f9a8d4;
     -fx-border-width: 2px;
     -fx-padding: 20px;
     -fx-font-size: 14px;
-    -fx-text-fill: #831843;  /* Σκούρο ροζ-μοβ */
+    -fx-text-fill: #831843;
     -fx-pref-width: 550px;
     -fx-pref-height: 320px;
-    -fx-font-family: 'Monospaced', monospace;  /* Για ωραία εμφάνιση αποτελεσμάτων */
+    -fx-font-family: 'Monospaced', monospace;
 }
 
 .popup-textarea .content {
@@ -183,9 +183,9 @@
     -fx-padding: 12px 20px;
     -fx-cursor: hand;
     -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.2), 8, 0, 0, 3);
-    -fx-min-width: 120px;  /* ΟΛΑ ΙΔΙΟ ΜΕΓΕΘΟΣ */
-    -fx-pref-width: 120px;  /* ΟΛΑ ΙΔΙΟ ΜΕΓΕΘΟΣ */
-    -fx-max-width: 120px;   /* ΟΛΑ ΙΔΙΟ ΜΕΓΕΘΟΣ */
+    -fx-min-width: 120px;
+    -fx-pref-width: 120px;
+    -fx-max-width: 120px;
 }
 
 /* Κουμπί Export - Μωβ */
