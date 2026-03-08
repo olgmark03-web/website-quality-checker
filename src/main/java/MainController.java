@@ -27,8 +27,6 @@ public class MainController {
         loadHistory();
         // Απόκρυψη της μπάρας προόδου μέχρι να ξεκινήσει κάποια ανάλυση
         progressBar.setVisible(false);
-
-
     }
 
     // Μέθοδος ανάλυσης ιστοσελίδας
