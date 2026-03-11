@@ -293,7 +293,7 @@ public class GDPRChecker {
                 }
             }
 
-            // Υπολογισμός βαθμολογίας με βάση τα αποτελέσματα απο παραπάνω
+            // Υπολογισμός βαθμολογίας με βάση τα αποτελέσματα από παραπάνω
             if (hasEmail) score += 3;
             if (hasContactForm) score += 3;
             if (hasDPO) score += 2;
