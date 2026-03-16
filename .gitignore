@@ -46,8 +46,7 @@ lib/chromedriver.exe
 
 # History and data files (θα δημιουργούνται κατά την εκτέλεση)
 website_checker_history.txt
-websites_to_analyze.txt
-*.csv
+*csv
 
 # Logs
 logs/

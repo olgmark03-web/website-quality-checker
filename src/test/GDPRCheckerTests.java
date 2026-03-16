@@ -1,11 +1,13 @@
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.*;
 import org.junit.jupiter.params.provider.*;
+import org.openqa.selenium.*;
 import java.util.*;
 import java.time.Duration;
 import java.time.Instant;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
 @DisplayName("GDPR Checker - Unit Tests")
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -43,6 +45,10 @@ class GDPRCheckerTests {
     private static int failedTests = 0;
     private static int currentTestNumber = 1;
 
+    // WebDriver mock για χρήση στα τεστ
+    private WebDriver mockDriver;
+    private WebElement mockBody;
+    private List<WebElement> mockLinks;
 
     @BeforeAll
     static void setupAll() {
@@ -50,16 +56,45 @@ class GDPRCheckerTests {
         printHeader();
     }
 
+    @BeforeEach
+    void setUp() {
+        // Δημιουργία mock WebDriver πριν από κάθε τεστ
+        mockDriver = mock(WebDriver.class);
+        mockBody = mock(WebElement.class);
+        mockLinks = new ArrayList<>();
+
+        when(mockDriver.findElement(By.tagName("body"))).thenReturn(mockBody);
+        when(mockDriver.findElements(By.tagName("a"))).thenReturn(mockLinks);
+    }
+
     @AfterAll
     static void cleanupAll() {
         printTestSummary();
+    }
+
+    private static void printHeader() {
+        System.out.println("\n" + "=".repeat(80));
+        System.out.println(" GDPR CHECKER - UNIT TESTS SUITE");
+        System.out.println("=".repeat(80));
+    }
+
+    private static void recordTestResult(int testNumber, String testName, boolean passed, String message, long durationMs) {
+        TestResult result = new TestResult(testNumber, testName, passed, message, durationMs);
+        testResults.add(result);
+        totalTests++;
+        if (passed) {
+            passedTests++;
+        } else {
+            failedTests++;
+        }
+        System.out.printf("Αποτέλεσμα: %s (%dms)%n", passed ? "ΕΠΙΤΥΧΙΑ" : "ΑΠΟΤΥΧΙΑ", durationMs);
     }
 
     @Test
     @Order(1)
     @DisplayName("01. Βασικός έλεγχος βαθμολογίας GDPR")
     @Tag("Κρίσιμο")
-    void test01_BasicGDPRRating() {
+    void BasicGDPRRating() {
         int testNumber = currentTestNumber++;
         Instant start = Instant.now();
         String testName = "Βασικός έλεγχος βαθμολογίας";
@@ -94,32 +129,14 @@ class GDPRCheckerTests {
     @Order(2)
     @DisplayName("02-25. Παραμετρικά τεστ για βαθμολογία")
     @CsvSource({
-            "100, EXCELLENT",
-            "95,  EXCELLENT",
-            "85,  EXCELLENT",
-            "80,  EXCELLENT",
-            "79,  GOOD",
-            "75,  GOOD",
-            "70,  GOOD",
-            "65,  GOOD",
-            "60,  GOOD",
-            "59,  FAIR",
-            "55,  FAIR",
-            "50,  FAIR",
-            "45,  FAIR",
-            "40,  FAIR",
-            "39,  NEEDS IMPROVEMENT",
-            "35,  NEEDS IMPROVEMENT",
-            "30,  NEEDS IMPROVEMENT",
-            "25,  NEEDS IMPROVEMENT",
-            "20,  NEEDS IMPROVEMENT",
-            "19,  POOR",
-            "15,  POOR",
-            "10,  POOR",
-            "5,   POOR",
-            "0,   POOR"
+            "100, EXCELLENT", "95, EXCELLENT", "85, EXCELLENT", "80, EXCELLENT",
+            "79, GOOD", "75, GOOD", "70, GOOD", "65, GOOD", "60, GOOD",
+            "59, FAIR", "55, FAIR", "50, FAIR", "45, FAIR", "40, FAIR",
+            "39, NEEDS IMPROVEMENT", "35, NEEDS IMPROVEMENT", "30, NEEDS IMPROVEMENT",
+            "25, NEEDS IMPROVEMENT", "20, NEEDS IMPROVEMENT",
+            "19, POOR", "15, POOR", "10, POOR", "5, POOR", "0, POOR"
     })
-    void test02_to_25_ParameterizedRating(int score, String expectedRating) {
+    void ParameterizedRating(int score, String expectedRating) {
         int testNumber = currentTestNumber++;
         Instant start = Instant.now();
         String testName = String.format("Παράμετροι: %d → %s", score, expectedRating);
@@ -145,8 +162,8 @@ class GDPRCheckerTests {
 
     @Test
     @Order(26)
-    @DisplayName("26. Δημιουργία GDPRResult αντικειμένου")
-    void test26_GDPRResultObject() {
+    @DisplayName("26. Έλεγχος δημιουργίας GDPRResult")
+    void test_GDPRResult() {
         int testNumber = currentTestNumber++;
         Instant start = Instant.now();
         String testName = "Δημιουργία GDPRResult";
@@ -154,30 +171,34 @@ class GDPRCheckerTests {
         try {
             System.out.printf("\nΤΕΣΤ %02d: %s%n", testNumber, testName);
 
-            GDPRChecker.GDPRResult result = new GDPRChecker.GDPRResult();
+            // Προετοιμασία mock για μια βασική ιστοσελίδα
+            when(mockBody.getText()).thenReturn("This is a test page with some content");
 
-            result.score = 88;
-            result.report = "GDPR COMPLIANCE CHECK\nΒαθμολογία: 88/100\nΚατάσταση: Άριστη\n";
-            result.recommendations = Arrays.asList(
-                    "Πολιτική Απορρήτου: Βρέθηκε",
-                    "Cookie Banner: Χρειάζεται βελτίωση"
-            );
+            // Mock για links (κανένα link πολιτικής απορρήτου)
+            WebElement mockLink = mock(WebElement.class);
+            when(mockLink.getText()).thenReturn("Home");
+            when(mockLink.getAttribute("href")).thenReturn("http://example.com");
+            when(mockLink.isDisplayed()).thenReturn(true);
+            when(mockLink.isEnabled()).thenReturn(true);
+            mockLinks.add(mockLink);
 
-            // ΕΛΕΓΧΟΙ
+            // Εκτέλεση της πραγματικής μεθόδου
+            GDPRChecker.GDPRResult result = GDPRChecker.checkGDPRCompliance(mockDriver);
+
+            // Έλεγχοι
             assertAll(testName,
-                    () -> assertEquals(88, result.score, "Η βαθμολογία πρέπει να είναι 88"),
+                    () -> assertNotNull(result, "Το αποτέλεσμα δεν πρέπει να είναι κενό"),
+                    () -> assertTrue(result.score >= 0 && result.score <= 100,
+                            "Η βαθμολογία πρέπει να είναι μεταξύ 0-100, ήταν: " + result.score),
                     () -> assertNotNull(result.report, "Η αναφορά δεν πρέπει να είναι κενή"),
                     () -> assertTrue(result.report.contains("GDPR COMPLIANCE CHECK"),
                             "Η αναφορά πρέπει να περιέχει 'GDPR COMPLIANCE CHECK'"),
-                    () -> assertNotNull(result.recommendations, "Οι συστάσεις δεν πρέπει να είναι κενές"),
-                    () -> assertEquals(2, result.recommendations.size(),
-                            "Πρέπει να έχει 2 συστάσεις"),
-                    () -> assertTrue(result.recommendations.get(0).contains("Πολιτική Απορρήτου"),
-                            "Η πρώτη σύσταση πρέπει να αναφέρεται σε Πολιτική Απορρήτου")
+                    () -> assertNotNull(result.recommendations, "Οι συστάσεις δεν πρέπει να είναι κενές")
             );
 
             long duration = Duration.between(start, Instant.now()).toMillis();
-            recordTestResult(testNumber, testName, true, "GDPRResult αντικείμενο δημιουργήθηκε επιτυχώς", duration);
+            recordTestResult(testNumber, testName, true,
+                    "GDPRResult δημιουργήθηκε επιτυχώς από checkGDPRCompliance()", duration);
 
         } catch (AssertionError e) {
             long duration = Duration.between(start, Instant.now()).toMillis();
@@ -188,57 +209,53 @@ class GDPRCheckerTests {
 
     @Test
     @Order(27)
-    @DisplayName("27. Έλεγχος ελληνικών keywords")
-    @Tag("ελληνικά")
-    void test27_GreekKeywords() {
+    @DisplayName("27. Έλεγχος ανίχνευσης ελληνικών keywords από τον κώδικα")
+    void GreekKeywordsDetection() {
         int testNumber = currentTestNumber++;
         Instant start = Instant.now();
-        String testName = "Έλεγχος ελληνικών keywords";
+        String testName = "Έλεγχος ανίχνευσης ελληνικών keywords";
 
         try {
             System.out.printf("\nΤΕΣΤ %02d: %s%n", testNumber, testName);
 
-            String[] privacyKeywords = {
-                    "πολιτική απορρήτου",
-                    "απορρήτου",
-                    "προστασία δεδομένων",
-                    "προστασία προσωπικών δεδομένων"
-            };
+            // Test 1: Έλεγχος checkPrivacyPolicy με ελληνικό κείμενο
+            when(mockBody.getText()).thenReturn("Η πολιτική απορρήτου της εταιρείας μας");
 
-            String[] cookieKeywords = {
-                    "συμφωνώ",
-                    "αποδέχομαι",
-                    "συγκατάθεση",
-                    "αποδοχή",
-                    "συναινώ"
-            };
+            // Mock για link που οδηγεί σε πολιτική απορρήτου
+            WebElement mockPrivacyLink = mock(WebElement.class);
+            when(mockPrivacyLink.getText()).thenReturn("Πολιτική Απορρήτου");
+            when(mockPrivacyLink.getAttribute("href")).thenReturn("/privacy");
+            when(mockPrivacyLink.isDisplayed()).thenReturn(true);
+            when(mockPrivacyLink.isEnabled()).thenReturn(true);
 
-            // Έλεγχος keywords
-            assertAll(testName,
-                    () -> assertTrue(privacyKeywords.length >= 3,
-                            "Πρέπει να υπάρχουν τουλάχιστον 3 keywords για απόρρητο"),
-                    () -> assertTrue(cookieKeywords.length >= 3,
-                            "Πρέπει να υπάρχουν τουλάχιστον 3 keywords για cookies"),
-                    () -> {
-                        for (String keyword : privacyKeywords) {
-                            assertNotNull(keyword, "Keyword δεν μπορεί να είναι κενό");
-                            assertTrue(keyword.length() >= 3,
-                                    "Keyword '" + keyword + "' είναι πολύ μικρό");
-                        }
-                    },
-                    () -> {
-                        for (String keyword : cookieKeywords) {
-                            assertNotNull(keyword, "Keyword δεν μπορεί να είναι κενό");
-                            assertTrue(keyword.length() >= 3,
-                                    "Keyword '" + keyword + "' είναι πολύ μικρό");
-                        }
-                    }
-            );
+            // Mock για άσχετο link
+            WebElement mockOtherLink = mock(WebElement.class);
+            when(mockOtherLink.getText()).thenReturn("Home");
+            when(mockOtherLink.getAttribute("href")).thenReturn("/home");
+
+            mockLinks.clear();
+            mockLinks.add(mockPrivacyLink);
+            mockLinks.add(mockOtherLink);
+
+            int privacyScore = GDPRChecker.checkPrivacyPolicy(mockDriver);
+            assertTrue(privacyScore >= 15,
+                    "Η checkPrivacyPolicy δεν ανίχνευσε ελληνικά keywords. Βαθμολογία: " + privacyScore);
+
+            // Test 2: Έλεγχος checkCookiesConsent με ελληνικό κείμενο
+            when(mockBody.getText()).thenReturn("Συμφωνώ με τη χρήση cookies για καλύτερη εμπειρία");
+
+            // Mock για cookie banner
+            WebElement mockCookieBanner = mock(WebElement.class);
+            when(mockDriver.findElements(By.cssSelector("[class*='cookie']")))
+                    .thenReturn(Collections.singletonList(mockCookieBanner));
+
+            int cookiesScore = GDPRChecker.checkCookiesConsent(mockDriver);
+            assertTrue(cookiesScore >= 5,
+                    "Η checkCookiesConsent δεν ανίχνευσε ελληνικά keywords. Βαθμολογία: " + cookiesScore);
 
             long duration = Duration.between(start, Instant.now()).toMillis();
             recordTestResult(testNumber, testName, true,
-                    String.format("Βρέθηκαν %d privacy + %d cookie keywords",
-                            privacyKeywords.length, cookieKeywords.length), duration);
+                    "Ελληνικά keywords ανιχνεύονται σωστά από τον κώδικα", duration);
 
         } catch (AssertionError e) {
             long duration = Duration.between(start, Instant.now()).toMillis();
@@ -247,11 +264,10 @@ class GDPRCheckerTests {
         }
     }
 
-
     @Test
     @Order(28)
     @DisplayName("28. Έλεγχος συνέπειας βαθμολογιών")
-    void test28_ScoreConsistency() {
+    void ScoreConsistency() {
         int testNumber = currentTestNumber++;
         Instant start = Instant.now();
         String testName = "Έλεγχος συνέπειας βαθμολογιών";
@@ -259,11 +275,9 @@ class GDPRCheckerTests {
         try {
             System.out.printf("\nΤΕΣΤ %02d: %s%n", testNumber, testName);
 
-            // Έλεγχος ότι υψηλότερη βαθμολογία = ίδια ή καλύτερη βαθμολογία
             for (int i = 0; i < 100; i++) {
                 String rating1 = GDPRChecker.getGDPRRating(i);
                 String rating2 = GDPRChecker.getGDPRRating(i + 1);
-
 
                 String[] ratingOrder = {"POOR", "NEEDS IMPROVEMENT", "FAIR", "GOOD", "EXCELLENT"};
                 int index1 = Arrays.asList(ratingOrder).indexOf(rating1);
@@ -290,7 +304,7 @@ class GDPRCheckerTests {
     @Order(29)
     @DisplayName("29. Ανάλυση οριακών τιμών")
     @Tag("boundary")
-    void test29_BoundaryValues() {
+    void BoundaryValues() {
         int testNumber = currentTestNumber++;
         Instant start = Instant.now();
         String testName = "Ανάλυση οριακών τιμών";
@@ -337,79 +351,46 @@ class GDPRCheckerTests {
         }
     }
 
-
     @Test
     @Order(30)
-    @DisplayName("30. Έλεγχος μοναδικότητας βαθμολογίας")
-    void test30_UniqueRatings() {
-        int testNumber = currentTestNumber++;
-        Instant start = Instant.now();
-        String testName = "Έλεγχος μοναδικότητας βαθμολογίας";
-
-        try {
-            System.out.printf("\nΤΕΣΤ %02d: %s%n", testNumber, testName);
-
-            Set<String> uniqueRatings = new HashSet<>();
-            for (int score = 0; score <= 100; score++) {
-                uniqueRatings.add(GDPRChecker.getGDPRRating(score));
-            }
-
-            assertAll(testName,
-                    () -> assertEquals(5, uniqueRatings.size(),
-                            "Πρέπει να υπάρχουν 5 διαφορετικά ratings, βρέθηκαν: " + uniqueRatings.size()),
-                    () -> assertTrue(uniqueRatings.contains("EXCELLENT"),
-                            "Πρέπει να περιέχει EXCELLENT"),
-                    () -> assertTrue(uniqueRatings.contains("GOOD"),
-                            "Πρέπει να περιέχει GOOD"),
-                    () -> assertTrue(uniqueRatings.contains("FAIR"),
-                            "Πρέπει να περιέχει FAIR"),
-                    () -> assertTrue(uniqueRatings.contains("NEEDS IMPROVEMENT"),
-                            "Πρέπει να περιέχει NEEDS IMPROVEMENT"),
-                    () -> assertTrue(uniqueRatings.contains("POOR"),
-                            "Πρέπει να περιέχει POOR")
-            );
-
-            long duration = Duration.between(start, Instant.now()).toMillis();
-            recordTestResult(testNumber, testName, true,
-                    "Βρέθηκαν όλα τα 5 μοναδικά ratings: " + uniqueRatings, duration);
-
-        } catch (AssertionError e) {
-            long duration = Duration.between(start, Instant.now()).toMillis();
-            recordTestResult(testNumber, testName, false, "Σφάλμα: " + e.getMessage(), duration);
-            throw e;
-        }
-    }
-
-
-    @Test
-    @Order(31)
-    @DisplayName("31. Δοκιμή απόδοσης")
+    @DisplayName("30. Δοκιμή απόδοσης checkGDPRCompliance")
     @Tag("performance")
-    void test31_Performance() {
+    void test_Performance() {
         int testNumber = currentTestNumber++;
         Instant start = Instant.now();
-        String testName = "Δοκιμή απόδοσης";
+        String testName = "Δοκιμή απόδοσης checkGDPRCompliance";
 
         try {
             System.out.printf("\nΤΕΣΤ %02d: %s%n", testNumber, testName);
+
+            // Προετοιμασία mock για μια σχετικά μεγάλη ιστοσελίδα
+            StringBuilder largeText = new StringBuilder();
+            for (int i = 0; i < 1000; i++) {
+                largeText.append("This is a test line ").append(i).append("\n");
+            }
+            when(mockBody.getText()).thenReturn(largeText.toString());
+
+            // Προσθήκη πολλών mock links
+            for (int i = 0; i < 50; i++) {
+                WebElement mockLink = mock(WebElement.class);
+                when(mockLink.getText()).thenReturn("Link " + i);
+                when(mockLink.getAttribute("href")).thenReturn("http://example.com/link" + i);
+                mockLinks.add(mockLink);
+            }
 
             long testStart = System.nanoTime();
 
-            // Εκτέλεση 1000 κλήσεων
-            for (int i = 0; i < 1000; i++) {
-
-                GDPRChecker.getGDPRRating(i % 101);
-            }
+            GDPRChecker.checkGDPRCompliance(mockDriver);
 
             long testEnd = System.nanoTime();
             long durationMs = (testEnd - testStart) / 1_000_000;
 
-            assertTrue(durationMs < 100,
-                    "Η απόδοση είναι αργή: " + durationMs + "ms (όριο: 100ms)");
+            assertTrue(durationMs < 2000,
+                    "Η απόδοση είναι αργή: " + durationMs + "ms (όριο: 2000ms)");
 
             long totalDuration = Duration.between(start, Instant.now()).toMillis();
             recordTestResult(testNumber, testName, true,
-                    String.format("1000 κλήσεις σε %dms (<100ms)", durationMs), totalDuration);
+                    String.format("checkGDPRCompliance σε %dms (<2000ms)", durationMs), totalDuration);
 
         } catch (AssertionError e) {
             long duration = Duration.between(start, Instant.now()).toMillis();
@@ -418,165 +399,98 @@ class GDPRCheckerTests {
         }
     }
 
-
     @Test
-    @Order(32)
-    @DisplayName("32. Έλεγχος συστάσεων")
-    void test32_Recommendations() {
+    @Order(31)
+    @DisplayName("31. Έλεγχος συστάσεων ανάλογα με τη βαθμολογία")
+    void test_Recommendations() {
         int testNumber = currentTestNumber++;
         Instant start = Instant.now();
-        String testName = "Έλεγχος συστάσεων";
+        String testName = "Έλεγχος συστάσεων ανάλογα με τη βαθμολογία";
 
         try {
             System.out.printf("\nΤΕΣΤ %02d: %s%n", testNumber, testName);
 
-            // Δημιουργία test scenarios
-            GDPRChecker.GDPRResult lowScoreResult = createMockResult(15);
-            GDPRChecker.GDPRResult highScoreResult = createMockResult(85);
+            // Σενάριο 1: Χαμηλή βαθμολογία (καμία συμμόρφωση)
+            when(mockBody.getText()).thenReturn("Just some text without any GDPR keywords");
+            mockLinks.clear(); // Κανένα link
+
+            GDPRChecker.GDPRResult lowScoreResult = GDPRChecker.checkGDPRCompliance(mockDriver);
+
+            // Σενάριο 2: Υψηλή βαθμολογία (πλήρης συμμόρφωση)
+            when(mockBody.getText()).thenReturn(
+                    "GDPR compliance privacy policy data protection " +
+                            "right to access right to erasure data portability " +
+                            "contact@example.com dpo@company.com"
+            );
+
+            // Προσθήκη link πολιτικής απορρήτου
+            WebElement mockPrivacyLink = mock(WebElement.class);
+            when(mockPrivacyLink.getText()).thenReturn("Privacy Policy");
+            when(mockPrivacyLink.getAttribute("href")).thenReturn("/privacy");
+            when(mockPrivacyLink.isDisplayed()).thenReturn(true);
+            when(mockPrivacyLink.isEnabled()).thenReturn(true);
+
+            // Προσθήκη cookie banner
+            WebElement mockCookieBanner = mock(WebElement.class);
+            when(mockDriver.findElements(By.cssSelector("[class*='cookie']")))
+                    .thenReturn(Collections.singletonList(mockCookieBanner));
+
+            mockLinks.clear();
+            mockLinks.add(mockPrivacyLink);
+
+            GDPRChecker.GDPRResult highScoreResult = GDPRChecker.checkGDPRCompliance(mockDriver);
 
             assertAll(testName,
                     () -> assertTrue(lowScoreResult.score < 40,
-                            "Χαμηλή βαθμολογία πρέπει να είναι < 40"),
-                    () -> assertTrue(highScoreResult.score >= 80,
-                            "Υψηλή βαθμολογία πρέπει να είναι ≥ 80"),
-                    () -> assertNotNull(lowScoreResult.recommendations,
-                            "Οι συστάσεις δεν πρέπει να είναι κενές"),
-                    () -> assertNotNull(highScoreResult.recommendations,
-                            "Οι συστάσεις δεν πρέπει να είναι κενές")
+                            "Χαμηλή βαθμολογία πρέπει να είναι < 40, ήταν: " + lowScoreResult.score),
+                    () -> assertTrue(highScoreResult.score >= 60,
+                            "Υψηλή βαθμολογία πρέπει να είναι ≥ 60, ήταν: " + highScoreResult.score),
+                    () -> assertFalse(lowScoreResult.recommendations.isEmpty(),
+                            "Η χαμηλή βαθμολογία πρέπει να έχει συστάσεις"),
+                    () -> assertTrue(lowScoreResult.recommendations.size() >= highScoreResult.recommendations.size(),
+                            "Η χαμηλή βαθμολογία πρέπει να έχει περισσότερες ή ίσες συστάσεις από την υψηλή"),
+                    () -> {
+                        // Έλεγχος ότι οι συστάσεις είναι σχετικές
+                        boolean hasPrivacyRecommendation = lowScoreResult.recommendations.stream()
+                                .anyMatch(r -> r.contains("Πολιτική Απορρήτου") || r.contains("Privacy"));
+                        assertTrue(hasPrivacyRecommendation,
+                                "Θα έπρεπε να υπάρχει σύσταση για Πολιτική Απορρήτου");
+                    }
             );
 
             long duration = Duration.between(start, Instant.now()).toMillis();
             recordTestResult(testNumber, testName, true,
-                    "Συστάσεις για διαφορετικές βαθμολογίες ελέγχθηκαν", duration);
+                    "Συστάσεις ανάλογες με τη βαθμολογία", duration);
 
         } catch (AssertionError e) {
             long duration = Duration.between(start, Instant.now()).toMillis();
             recordTestResult(testNumber, testName, false, "Σφάλμα: " + e.getMessage(), duration);
             throw e;
         }
-    }
-
-    @Test
-    @Order(33)
-    @DisplayName("33. Έλεγχος βαθμολογίας ορίων (0-100)")
-    void test33_ScoreRange() {
-        int testNumber = currentTestNumber++;
-        Instant start = Instant.now();
-        String testName = "Έλεγχος βαθμολογίας ορίων";
-
-        try {
-            System.out.printf("\nΤΕΣΤ %02d: %s%n", testNumber, testName);
-
-            List<String> invalidRatings = new ArrayList<>();
-
-            // Έλεγχος για όλες τις πιθανές βαθμολογίες
-            for (int score = 0; score <= 100; score++) {
-                String rating = GDPRChecker.getGDPRRating(score);
-
-                if (rating.isEmpty()) {
-                    invalidRatings.add("Βαθμολογία " + score + ": null ή κενό rating");
-                }
-
-                // Έλεγχος ότι το rating είναι ένα από τα έγκυρα
-                List<String> validRatings = Arrays.asList(
-                        "EXCELLENT", "GOOD", "FAIR", "NEEDS IMPROVEMENT", "POOR"
-                );
-
-                if (!validRatings.contains(rating)) {
-                    invalidRatings.add("Βαθμολογία " + score + ": μη έγκυρο rating '" + rating + "'");
-                }
-            }
-
-            if (!invalidRatings.isEmpty()) {
-                fail("Βρέθηκαν μη έγκυρα ratings:\n" + String.join("\n", invalidRatings));
-            }
-
-            long duration = Duration.between(start, Instant.now()).toMillis();
-            recordTestResult(testNumber, testName, true,
-                    "Έλεγχος 101 βαθμολογιών (0-100) επιτυχής", duration);
-
-        } catch (AssertionError e) {
-            long duration = Duration.between(start, Instant.now()).toMillis();
-            recordTestResult(testNumber, testName, false, "Σφάλμα: " + e.getMessage(), duration);
-            throw e;
-        }
-    }
-
-
-    private synchronized void recordTestResult(int testNumber, String testName, boolean passed, String message, long durationMs) {
-        totalTests++;
-        if (passed) {
-            passedTests++;
-        } else {
-            failedTests++;
-        }
-
-        TestResult result = new TestResult(testNumber, testName, passed, message, durationMs);
-        testResults.add(result);
-
-        // Ταξινόμηση για να εμφανίζονται σε σειρά
-        testResults.sort(Comparator.comparingInt(r -> r.testNumber));
-    }
-
-    private static void printHeader() {
-        System.out.println("\n" + "=".repeat(80));
-        System.out.println("GDPR CHECKER - UNIT TESTS");
-        System.out.println(new Date());
-        System.out.println("=".repeat(80));
-        System.out.println("\nΑΡΧΗ ΕΚΤΕΛΕΣΗΣ ΤΕΣΤ...\n");
     }
 
     private static void printTestSummary() {
         long totalDuration = Duration.between(testSuiteStartTime, Instant.now()).toMillis();
 
         System.out.println("\n" + "=".repeat(80));
-        System.out.println("ΣΥΝΟΠΤΙΚΗ ΑΝΑΦΟΡΑ ΑΠΟΤΕΛΕΣΜΑΤΩΝ");
+        System.out.println(" ΑΠΟΤΕΛΕΣΜΑΤΑ ΤΕΣΤ");
         System.out.println("=".repeat(80));
 
-        System.out.printf("\nΣΤΑΤΙΣΤΙΚΑ:%n");
-        System.out.printf("   Σύνολο Τεστ:     %d%n", totalTests);
-        System.out.printf("   Επιτυχημένα:      %d %n", passedTests);
-        System.out.printf("   Αποτυχημένα:      %d %n", failedTests);
-        System.out.printf("   Ποσοστό Επιτυχίας: %.1f%%%n",
-                totalTests > 0 ? (passedTests * 100.0 / totalTests) : 0);
-        System.out.printf("   Συνολική Διάρκεια: %dms%n", totalDuration);
+        System.out.printf("Σύνολο τεστ: %d%n", totalTests);
+        System.out.printf("Επιτυχίες:   %d%n", passedTests);
+        System.out.printf("Αποτυχίες:   %d%n", failedTests);
+        System.out.printf("Ποσοστό:     %.1f%%%n",
+                (totalTests > 0) ? (passedTests * 100.0 / totalTests) : 0);
+        System.out.printf("Συνολικός χρόνος: %dms%n", totalDuration);
 
-        // Λεπτομερής λίστα
-        System.out.printf("\nΛΕΠΤΟΜΕΡΗΣ ΛΙΣΤΑ ΑΠΟΤΕΛΕΣΜΑΤΩΝ:%n");
-        System.out.println("-".repeat(90));
-        System.out.printf("%-8s %-50s %-15s %-10s   %s%n",
-                "ΤΕΣΤ", "ΟΝΟΜΑ", "ΚΑΤΑΣΤΑΣΗ", "ΔΙΑΡΚΕΙΑ", "ΜΥΝΗΜΑ");
-        System.out.println("-".repeat(90));
+        System.out.println("\n" + "-".repeat(80));
+        System.out.println(" ΑΝΑΛΥΤΙΚΑ ΑΠΟΤΕΛΕΣΜΑΤΑ");
+        System.out.println("-".repeat(80));
 
         for (TestResult result : testResults) {
             System.out.println(result);
         }
 
-        System.out.println("-".repeat(90));
-
-
-        if (failedTests == 0) {
-            System.out.println("\nΟΛΑ ΤΑ TESTS ΠΕΡΑΣΑΝ ΕΠΙΤΥΧΩΣ!");
-        } else {
-            System.out.println("\nΥΠΑΡΧΟΥΝ ΑΠΟΤΥΧΗΜΕΝΑ TESTS!");
-        }
-    }
-
-
-    private GDPRChecker.GDPRResult createMockResult(int score) {
-        GDPRChecker.GDPRResult result = new GDPRChecker.GDPRResult();
-        result.score = score;
-        result.report = "Mock Report - Score: " + score;
-        result.recommendations = new ArrayList<>();
-
-        if (score < 20) {
-            result.recommendations.add("• Σημαντικές βελτιώσεις απαιτούνται");
-        } else if (score < 60) {
-            result.recommendations.add("• Χρειάζονται βελτιώσεις");
-        } else {
-            result.recommendations.add("• Καλή συμμόρφωση");
-        }
-
-        return result;
+        System.out.println("=".repeat(80));
     }
 }

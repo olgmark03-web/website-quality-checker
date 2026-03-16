@@ -138,7 +138,7 @@ public class MainController {
     }
 
     // Μέθοδος αποθήκευσης ιστορικού
-    private void saveHistory(String entry) {
+    public void saveHistory(String entry) {
         try (FileWriter fw = new FileWriter(HISTORY_FILE, true);
              BufferedWriter bw = new BufferedWriter(fw);
              PrintWriter out = new PrintWriter(bw)) {
@@ -149,7 +149,7 @@ public class MainController {
     }
 
     // Μέθοδος φόρτωσης ιστορικού από αρχείο στη μνήμη
-    private void loadHistory() {
+    public void loadHistory() {
         File file = new File(HISTORY_FILE);
         if (file.exists()) {
             try (BufferedReader reader = new BufferedReader(new FileReader(file))) {

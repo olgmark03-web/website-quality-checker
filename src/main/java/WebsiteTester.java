@@ -8,14 +8,14 @@ public class WebsiteTester {
 
         System.out.println("╔══════════════════════════════════════╗");
         System.out.println("║         ΣΥΓΚΡΙΤΙΚΗ ΑΞΙΟΛΟΓΗΣΗ        ║");
-        System.out.println("║            50 ΙΣΤΟΣΕΛΙΔΩΝ            ║");
+        System.out.println("║            60 ΙΣΤΟΣΕΛΙΔΩΝ            ║");
         System.out.println("╚══════════════════════════════════════╝");
 
         try {
             // ΒΗΜΑ 1: Φόρτωσε τις ιστοσελίδες από αρχείο
             System.out.println("\nΒΗΜΑ 1: Φόρτωση ιστοσελίδων...");
             List<Website> websites = loadWebsites();
-            System.out.println("Φορτώθηκαν" + websites.size() + " ιστοσελίδες");
+            System.out.println("Φορτώθηκαν " + websites.size() + " ιστοσελίδες");
 
             // ΒΗΜΑ 2: Δημιούργησε το CSV αρχείο
             System.out.println("\nΒΗΜΑ 2: Δημιουργία CSV αρχείου...");
@@ -78,7 +78,7 @@ public class WebsiteTester {
                 String category = parts[1].trim();
                 String country = parts[2].trim();
 
-                if (!url.startsWith("http")) {
+                if (!url.startsWith("http://") && !url.startsWith("https://")) {
                     url = "https://" + url;
                 }
 
